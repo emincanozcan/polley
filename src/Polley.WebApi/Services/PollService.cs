@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Polley.WebApi.Context;
 using Polley.WebApi.Data;
-using Polley.WebApi.DTOs;
+using Polley.WebApi.DTOs.Request;
+using Polley.WebApi.DTOs.Response;
 
 namespace Polley.WebApi.Services;
 
@@ -15,10 +15,10 @@ public class PollService : IPollService
         _dbContext = dbContext;
     }
 
-    public async Task<PollReadDto> CreatePoll(PollCreateDto pollCreateDto)
+    public async Task<PollResponseDto> CreatePoll(PollCreateRequestDto pollCreateRequestDto)
     {
-        var question = new Question {Content = pollCreateDto.Question};
-        List<Answer> answers = pollCreateDto.Answers.Select(c => new Answer {Content = c, SelectedCount = 0}).ToList();
+        var question = new Question {Content = pollCreateRequestDto.Question};
+        List<Answer> answers = pollCreateRequestDto.Answers.Select(c => new Answer {Content = c, SelectedCount = 0}).ToList();
 
         Poll poll = new Poll
         {
@@ -29,20 +29,20 @@ public class PollService : IPollService
         _dbContext.Polls.Add(poll);
         await _dbContext.SaveChangesAsync();
 
-        return new PollReadDto
+        return new PollResponseDto
         {
             Id = poll.Id,
-            question = new QuestionReadDto
+            question = new QuestionResponseDto
             {
                 Id = poll.Question.Id,
                 Content = poll.Question.Content
             },
-            answers = poll.Answers.Select(answer => new AnswerReadDto
+            answers = poll.Answers.Select(answer => new AnswerResponseDto
                 {Id = answer.Id, Content = answer.Content, SelectedCount = answer.SelectedCount}).ToList()
         };
     }
 
-    public async Task<PollReadDto> GetPollById(int id)
+    public async Task<PollResponseDto> GetPollById(int id)
     {
         var poll = await _dbContext.Polls
             .Where(poll => poll.Id == id)
@@ -55,20 +55,20 @@ public class PollService : IPollService
             throw new Exception("Poll not found");
         }
 
-        return new PollReadDto
+        return new PollResponseDto
         {
             Id = poll.Id,
-            question = new QuestionReadDto
+            question = new QuestionResponseDto
             {
                 Id = poll.Question.Id,
                 Content = poll.Question.Content
             },
-            answers = poll.Answers.Select(answer => new AnswerReadDto
+            answers = poll.Answers.Select(answer => new AnswerResponseDto
                 {Id = answer.Id, Content = answer.Content, SelectedCount = answer.SelectedCount}).ToList()
         };
     }
 
-    public async Task<bool> SaveVote(VoteDto vote)
+    public async Task<bool> SaveVote(VoteCreateRequestDto voteCreateRequest)
     {
         // Note:
         // This logic is a little bit problematic, open to conflicts.
@@ -77,7 +77,7 @@ public class PollService : IPollService
         // Another solution is using locks ofc but I think it should be last option.
 
         var answer = await _dbContext.Answers
-            .Where(a => a.PollId == vote.PollId && a.Id == vote.AnswerId)
+            .Where(a => a.PollId == voteCreateRequest.PollId && a.Id == voteCreateRequest.AnswerId)
             .FirstOrDefaultAsync();
 
         if (answer == null)

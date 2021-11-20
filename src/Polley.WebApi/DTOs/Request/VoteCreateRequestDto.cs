@@ -1,8 +1,6 @@
-using Polley.WebApi.Data;
+namespace Polley.WebApi.DTOs.Request;
 
-namespace Polley.WebApi.DTOs;
-
-public class VoteDto
+public class VoteCreateRequestDto
 {
     public int PollId { get; set; }
     public int AnswerId { get; set; }

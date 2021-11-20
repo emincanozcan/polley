@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Polley.WebApi.DTOs;
+using Polley.WebApi.DTOs.Request;
 using Polley.WebApi.Services;
 
 namespace Polley.WebApi.Controllers;
@@ -16,11 +16,11 @@ public class VotesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] VoteDto voteDto)
+    public async Task<IActionResult> Create([FromBody] VoteCreateRequestDto voteCreateRequestDto)
     {
         try
         {
-            await _pollService.SaveVote(voteDto);
+            await _pollService.SaveVote(voteCreateRequestDto);
         }
         catch (Exception e)
         {

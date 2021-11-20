@@ -1,6 +1,6 @@
-namespace Polley.WebApi.DTOs;
+namespace Polley.WebApi.DTOs.Response;
 
-public class QuestionReadDto
+public class QuestionResponseDto
 {
     public int Id { get; set; }
     public string Content { get; set; }

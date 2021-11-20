@@ -1,5 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Polley.WebApi.DTOs;
+using Polley.WebApi.DTOs.Request;
 using Polley.WebApi.Services;
 
 namespace Polley.WebApi.Controllers;
@@ -16,9 +17,10 @@ public class PollsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] PollCreateDto pollCreateDto)
+    [Authorize]
+    public async Task<IActionResult> Create([FromBody] PollCreateRequestDto pollCreateRequestDto)
     {
-        var obj = await _pollService.CreatePoll(pollCreateDto);
+        var obj = await _pollService.CreatePoll(pollCreateRequestDto);
 
         return CreatedAtAction(nameof(Show), new {id = obj.Id},obj );
     }
