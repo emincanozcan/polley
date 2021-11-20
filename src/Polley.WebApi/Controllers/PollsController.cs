@@ -6,11 +6,11 @@ namespace Polley.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PollController : ControllerBase
+public class PollsController : ControllerBase
 {
     private readonly IPollService _pollService;
 
-    public PollController(IPollService pollService)
+    public PollsController(IPollService pollService)
     {
         _pollService = pollService;
     }
