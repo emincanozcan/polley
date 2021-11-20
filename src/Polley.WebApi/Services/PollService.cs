@@ -67,4 +67,28 @@ public class PollService : IPollService
                 {Id = answer.Id, Content = answer.Content, SelectedCount = answer.SelectedCount}).ToList()
         };
     }
+
+    public async Task<bool> SaveVote(VoteDto vote)
+    {
+        // Note:
+        // This logic is a little bit problematic, open to conflicts.
+        // It fetches data and increases column, after that updates the record at Database.
+        // A better approach might be doing this increment at database `SET SelectedCount=SelectedCount + 1` 
+        // Another solution is using locks ofc but I think it should be last option.
+
+        var answer = await _dbContext.Answers
+            .Where(a => a.PollId == vote.PollId && a.Id == vote.AnswerId)
+            .FirstOrDefaultAsync();
+
+        if (answer == null)
+        {
+            throw new Exception("Provided data is invalid.");
+        }
+
+        answer.SelectedCount += 1;
+
+        await _dbContext.SaveChangesAsync();
+
+        return true;
+    }
 }
